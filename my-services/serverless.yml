@@ -1,0 +1,57 @@
+service: my-services
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  stage: dev
+  region: ap-northeast-1
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - s3:*
+        - dynamodb:*
+        - lambda:*
+      Resource:
+        - "*"
+functions:
+  upload:
+    handler: upload.handle
+    events:
+      - http:
+          path: upload
+          method: post
+  after_upload:
+    handler: after_upload.store_metadata_for_dynamo
+    events:
+      - s3:
+          bucket: "sample-uploads-park"
+          event: s3:ObjectCreated:*
+  thumbnail:
+    handler: thumbnail.create
+    events:
+      - stream:
+          arn: "arn:aws:dynamodb:ap-northeast-1:545253934258:table/sample-items/stream/2017-12-24T12:15:09.590"
+          batchSize: 1
+          startingPosition: TRIM_HORIZON
+          enabled: true
+resources:
+  Resources:
+    ThumbBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+              BucketName: "sample-thumbnails-park"
+    ImagesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: "sample-items"
+        AttributeDefinitions:
+          - 
+            AttributeName: file_name
+            AttributeType: S
+        KeySchema:
+          - 
+            AttributeName: file_name
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
