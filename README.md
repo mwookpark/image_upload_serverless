@@ -1,3 +1,21 @@
+# Serverless練習
+
+
+レポジトリのままだとデプロイ時に失敗する為、以下の内容を修正
+・本来設定しているaws cliのリージョンに合わせる。（us-west-2　→　ap-northeast-1）
+・DynamoBDのストリームを設定（原本はcommentされている）
+・デプロイ時に「{bucket名} already exists.」とエラーになる為、下記を修正
+
+sample-thumbnails→sample-thumbnails-park
+sample-uploads   →sample-uploads-park
+
+## デプロイ失敗時の手順
+
+・S3から作られているbucketを削除
+・CloudFormationからスタックを削除
+
+原文は下記を参考。
+
 # ServerlessSample
 [Software Design 2017年10月号](http://gihyo.jp/magazine/SD/archive/2017/201710)にピクスタでも一部のシステムで使用している[ServerlessFramework](https://serverless.com/)のハンズオン記事を寄稿しました。
 これはその記事の中で使用するサンプルアプリケーションリポジトリです。
